@@ -84,4 +84,6 @@ The script depends on the following tools:
 - `curl`: for making API calls.
 - `xflux`: for adjusting the display's color temperature.
 - `nmcli`: NetworkManager, needed to call script on network connection.
+
+
 Ensure these tools are installed on your system before running the script.
