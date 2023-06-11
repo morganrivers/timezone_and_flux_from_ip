@@ -6,20 +6,27 @@
 
 IF=$1
 STATUS=$2
-LOG_FILE="$HOME/dispatcher.log"
-OUTPUT_FILE="$HOME/latlon.txt"
+
+username=$(who | awk '{print $1; exit}')
+
+LOG_FILE="/home/$username/dispatcher.log"
+OUTPUT_FILE="/home/$username/latlon.txt"
+
+# display=$(who | grep -P '\(:[0-9](\.[0-9])?\)' | awk '{print $5}' | tr -d '()')
+export DISPLAY=:0
 
 log_message() {
     echo "$1" >> $LOG_FILE
 }
 
-update_timezone() {
-    sudo tzupdate
+update_timezone() { 
+    echo "tzupdate things" >> $LOG_FILE
+    sudo tzupdate >> $LOG_FILE
     log_message "tzupdate command executed"
 }
 
 get_latlon() {
-    LATLON=`curl -s https://ipinfo.io/loc`
+    LATLON=`curl -s https://ipinfo.io/loc 2>> $LOG_FILE`
     LAT=$(echo $LATLON | cut -d ',' -f 1)
     LON=$(echo $LATLON | cut -d ',' -f 2)
     echo "$LAT,$LON" > $OUTPUT_FILE
@@ -27,39 +34,29 @@ get_latlon() {
 }
 
 kill_xflux() {
-    while true;
-        do allxflux=$(pidof xflux);
-        wtsp=" ";
-        tmpxflux=${allxflux%%"$wtsp"*};
-        allxflux=${allxflux#*"$wtsp"};
-        case "$allxflux" in
-            *" "*)
-                kill -9 "$tmpxflux";
-                continue;
-            ;;
-            *)
-                kill -9 "$tmpxflux";
-                break;
-            ;;
-        esac;
-    done;
+    killall xflux
     log_message "xflux killed"
 }
 
 restart_xflux() {
     LAT=$(cat $OUTPUT_FILE | cut -d ',' -f 1)
     LON=$(cat $OUTPUT_FILE | cut -d ',' -f 2)
-    xflux -l $LAT -g $LON -k 2000 &
+
+    w >> $LOG_FILE
+    export XAUTHORITY=/home/$username/.Xauthority
+    xflux -l $LAT -g $LON -k 2000 >> $LOG_FILE 2>&1 &
     log_message "New xflux started"
 }
 
-# Create files if not already created.
-touch $LOG_FILE
-touch $OUTPUT_FILE
-
-log_message "update_timezone started at $(date)"
-
 if [ "$STATUS" = "up" ]; then
+    
+    # Create files if not already created.
+    touch $LOG_FILE
+    touch $OUTPUT_FILE
+
+    log_message ""
+    log_message "Script update_timezone started at $(date)"
+
     update_timezone
     get_latlon
     kill_xflux
