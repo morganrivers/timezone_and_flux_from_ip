@@ -3,6 +3,7 @@
 This repository contains a shell script that updates the system timezone and the color temperature of the display based on the geolocation of the current IP address. The script is designed to be used with NetworkManager's dispatcher to be executed whenever a network connection goes up.
 
 NOTE: ONLY WORKS ON LINUX MACHINES WITH NETWORKMANAGER INSTALLED
+ALSO, YOU NEED TO BE USING X (PROBABLY X11)... SORRY
 
 To see  if you have network manager, run the following script: 
 
@@ -35,12 +36,18 @@ sudo cp timezone_and_flux_from_ip/etc/NetworkManager/dispatcher.d/update_timezon
 sudo chmod +x /etc/NetworkManager/dispatcher.d/update_timezone
 ```
 
-You also need to install xflux and tzupdate. On Debian, installation would be:
+You also need to install xflux and tzupdate.
+
+On systems with pip3, tzupdate installation would be:
 
 ```
 pip3 install --user tzupdate
-sudo apt-get install xflux
 ```
+As for xflux, check out:
+
+https://justgetflux.com/linux.html
+
+(Sorry, xflux is apparently closed source. But also redshift is not working well for some people with debian/archlinux. You could modify the script to work with redshift reasonably easily as well.)
 
 ## Dependencies
 
