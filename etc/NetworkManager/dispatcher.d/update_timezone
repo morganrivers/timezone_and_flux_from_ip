@@ -20,7 +20,6 @@ update_timezone() {
 
 get_latlon() {
     LATLON=`curl -s https://ipinfo.io/loc`
-    log_message "Latitude and Longitude: $LATLON"
     LAT=$(echo $LATLON | cut -d ',' -f 1)
     LON=$(echo $LATLON | cut -d ',' -f 2)
     echo "$LAT,$LON" > $OUTPUT_FILE
@@ -58,12 +57,12 @@ restart_xflux() {
 touch $LOG_FILE
 touch $OUTPUT_FILE
 
-log_message "Script started at $(date)"
+log_message "update_timezone started at $(date)"
 
 if [ "$STATUS" = "up" ]; then
     update_timezone
     get_latlon
     kill_xflux
     restart_xflux
-    log_message "Script finished at $(date)"
+    log_message "update_timezone finished at $(date)"
 fi
