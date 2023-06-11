@@ -75,7 +75,7 @@ Now, if that worked add xflux to your discoverable executables:
 cp xflux /usr/local/bin/
 ```
 
-(Sorry, xflux is apparently closed source. But also redshift is not working well for some people with debian/archlinux. You could modify the script to work with redshift reasonably easily as well. for example, replacing the line calling xflux with: `$ redshift -l $LAT:$LON`)
+(Sorry, xflux is apparently closed source. But also redshift is not working well for some people with debian/archlinux. You could modify the script to work with redshift reasonably easily as well. for example, replacing the line calling xflux with: `redshift -l $LAT:$LON`)
 
 ## Dependencies
 
