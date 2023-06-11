@@ -1,33 +1,33 @@
 #!/bin/sh
 
+# This script updates the system timezone and flux parameters based on the current IP geolocation
+# The script gets triggered whenever the network interface status changes to 'up'
+# It uses tzupdate for updating the timezone and xflux for adjusting the screen color temperature
+
 IF=$1
 STATUS=$2
 LOG_FILE="$HOME/dispatcher.log"
 OUTPUT_FILE="$HOME/latlon.txt"
-# Create files if not already created.
-touch $LOG_FILE
-touch $OUTPUT_FILE
 
-echo "Script started at $(date)" >> $LOG_FILE
-echo "Interface: $IF, Status: $STATUS" >> $LOG_FILE
+log_message() {
+    echo "$1" >> $LOG_FILE
+}
 
-if [ "$STATUS" = "up" ]; then
+update_timezone() {
     sudo tzupdate
-    echo "tzupdate command executed" >> $LOG_FILE
+    log_message "tzupdate command executed"
+}
 
-    # Call the geolocation API and capture the output
+get_latlon() {
     LATLON=`curl -s https://ipinfo.io/loc`
-    echo "Latitude and Longitude: $LATLON" >> $LOG_FILE
-
+    log_message "Latitude and Longitude: $LATLON"
     LAT=$(echo $LATLON | cut -d ',' -f 1)
     LON=$(echo $LATLON | cut -d ',' -f 2)
-
     echo "$LAT,$LON" > $OUTPUT_FILE
-    echo "Latitude: $LAT, Longitude: $LON" >> $LOG_FILE
+    log_message "Latitude: $LAT, Longitude: $LON"
+}
 
-    killall xflux;
-    echo "xflux killed" >> $LOG_FILE
-
+kill_xflux() {
     while true;
         do allxflux=$(pidof xflux);
         wtsp=" ";
@@ -44,10 +44,26 @@ if [ "$STATUS" = "up" ]; then
             ;;
         esac;
     done;
-    env >> $LOG_FILE
-    echo "New xflux started" >> $LOG_FILE
+    log_message "xflux killed"
+}
+
+restart_xflux() {
+    LAT=$(cat $OUTPUT_FILE | cut -d ',' -f 1)
+    LON=$(cat $OUTPUT_FILE | cut -d ',' -f 2)
     xflux -l $LAT -g $LON -k 2000 &
+    log_message "New xflux started"
+}
 
-    # Record the end of the script in the log file
-    echo "Script finished at $(date)" >> $LOG_FILE
+# Create files if not already created.
+touch $LOG_FILE
+touch $OUTPUT_FILE
 
+log_message "Script started at $(date)"
+
+if [ "$STATUS" = "up" ]; then
+    update_timezone
+    get_latlon
+    kill_xflux
+    restart_xflux
+    log_message "Script finished at $(date)"
+fi
