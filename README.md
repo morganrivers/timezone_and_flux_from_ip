@@ -3,6 +3,7 @@
 This repository contains a shell script that updates the system timezone and the color temperature of the display based on the geolocation of the current IP address. The script is designed to be used with NetworkManager's dispatcher to be executed whenever a network connection goes up.
 
 NOTE: ONLY WORKS ON LINUX MACHINES WITH NETWORKMANAGER INSTALLED
+
 ALSO, YOU NEED TO BE USING X (PROBABLY X11)
 
 To see  if you have network manager, run the following script: 
