@@ -43,9 +43,36 @@ On systems with pip3, tzupdate installation would be:
 ```
 pip3 install --user tzupdate
 ```
-As for xflux, check out:
+As for xflux, you can download from here:
 
 https://justgetflux.com/linux.html
+
+Once you dowload, you can just run:
+
+```
+ tar zxvf xflux64.tgz
+``
+check it works by running it
+
+```
+./xflux
+```
+
+You should get:
+```
+--------
+Welcome to xflux (f.lux for X)
+This will only work if you're running X on console.
+
+Usage: ./xflux [-z zipcode | -l latitude] [-g longitude] [-k colortemp (default 3400)] [-r 1 (use randr)] [-nofork]
+protip: Say where you are (use -z or -l).
+```
+
+Now, if that worked add xflux to your discoverable executables:
+
+```
+cp xflux /usr/local/bin/
+```
 
 (Sorry, xflux is apparently closed source. But also redshift is not working well for some people with debian/archlinux. You could modify the script to work with redshift reasonably easily as well.)
 
