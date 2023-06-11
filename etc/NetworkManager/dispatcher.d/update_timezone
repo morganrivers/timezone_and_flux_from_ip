@@ -4,18 +4,15 @@ IF=$1
 STATUS=$2
 LOG_FILE="$HOME/dispatcher.log"
 OUTPUT_FILE="$HOME/latlon.txt"
-
 # Create files if not already created.
 touch $LOG_FILE
 touch $OUTPUT_FILE
 
-
-LOG_FILE=/home/dmrivers/Code/Debian/dispatcher.log
 echo "Script started at $(date)" >> $LOG_FILE
 echo "Interface: $IF, Status: $STATUS" >> $LOG_FILE
 
 if [ "$STATUS" = "up" ]; then
-    sudo -u dmrivers tzupdate
+    sudo tzupdate
     echo "tzupdate command executed" >> $LOG_FILE
 
     # Call the geolocation API and capture the output
