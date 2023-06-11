@@ -41,7 +41,7 @@ You also need to install xflux and tzupdate.
 On systems with pip3, tzupdate installation would be:
 
 ```
-pip3 install --user tzupdate
+sudo pip install -U tzupdate
 ```
 
 As for xflux, you can download from here:
