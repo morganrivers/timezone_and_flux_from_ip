@@ -15,8 +15,7 @@ If NetworkManager is installed, this command will return the version of NetworkM
 
 ## Script
 
-The main script is located at `/etc/NetworkManager/dispatcher.d/update_timezone` and needs to be made executable (`chmod +x`) to work correctly. 
-
+The main script is located at `/etc/NetworkManager/dispatcher.d/update_timezone`.
 The script performs the following actions:
 
 1. Logs the start of the script, the network interface, and its status.
