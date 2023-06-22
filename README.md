@@ -77,6 +77,16 @@ sudo cp xflux /usr/local/bin/
 
 (Sorry, xflux is apparently closed source. But also redshift is not working well for some people with debian/archlinux. You could modify the script to work with redshift reasonably easily as well. for example, replacing the line calling xflux with: `redshift -l $LAT:$LON`)
 
+## Usage
+
+Whenever you run `nmcli device wifi`, you see a list of wifi options.
+
+Then, the following (standard command line usage of networkmanager nmcli) will not only connect to wifi, it will also run the script automatically and set your timezone and turn on your flux now!
+
+<pre>
+ nmcli device wifi connect <b>your_network</b> password <b>your_password</b>
+</pre>
+
 ## Dependencies
 
 The script depends on the following tools:
