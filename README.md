@@ -19,6 +19,20 @@ ps -e | grep tty
 ```
 You're running X as long as you see "Xorg" as one of the processes.
 
+Systems tested that this works on so far:
+
+```
+Linux 5.10.0-14-amd64 #1 SMP Debian 5.10.113-1 (2022-04-29) x86_64 GNU/Linux
+Linux casta 5.10.133 #1 SMP PREEMPT Sat Nov 19 21:06:46 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+```
+You can check your system by running the command
+
+```
+uname -a
+```
+
+
+
 ## Script
 
 The main script is located at `/etc/NetworkManager/dispatcher.d/update_timezone`.
@@ -93,11 +107,7 @@ Then, the following (standard command line usage of networkmanager nmcli) will n
  nmcli device wifi connect <b>your_network</b> password <b>your_password</b>
 </pre>
 
-## Requirements
-
-The script has been tested and works on the following systems so far:
-
-But it will probably work on any linux using X11, with the depencies below set up.
+## Dependencies
 
 The script depends on the following tools:
 - `tzupdate`: for updating the system timezone.
