@@ -81,7 +81,7 @@ sudo cp xflux /usr/local/bin/
 
 Whenever you run `nmcli device wifi`, you see a list of wifi options.
 
-Then, the following (standard command line usage of networkmanager nmcli) will not only connect to wifi, it will also run the script automatically and set your timezone and turn on your flux now!
+Then, the following (standard command line usage of networkmanager nmcli) will not only connect to wifi, it will also run the script automatically and set your timezone and system clock, and turn on your flux now for better sleep!
 
 <pre>
  nmcli device wifi connect <b>your_network</b> password <b>your_password</b>
