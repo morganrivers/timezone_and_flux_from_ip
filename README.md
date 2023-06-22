@@ -13,6 +13,12 @@ nmcli -v
 ```
 If NetworkManager is installed, this command will return the version of NetworkManager that is currently installed on your system. If it is not installed, you will see an error message saying "command not found" or similar.
 
+To test if you are using X (such as X11), run the following:
+```
+ps -e | grep tty
+```
+You're running X as long as you see "Xorg" as one of the processes.
+
 ## Script
 
 The main script is located at `/etc/NetworkManager/dispatcher.d/update_timezone`.
@@ -87,7 +93,11 @@ Then, the following (standard command line usage of networkmanager nmcli) will n
  nmcli device wifi connect <b>your_network</b> password <b>your_password</b>
 </pre>
 
-## Dependencies
+## Requirements
+
+The script has been tested and works on the following systems so far:
+
+But it will probably work on any linux using X11, with the depencies below set up.
 
 The script depends on the following tools:
 - `tzupdate`: for updating the system timezone.
