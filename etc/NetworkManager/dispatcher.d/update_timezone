@@ -25,6 +25,12 @@ update_timezone() {
     log_message "tzupdate command executed"
 }
 
+check_timezone_change() {
+    current_timezone=$(tzupdate --print-system-timezone)
+    suggested_timezone=$(tzupdate -p)
+    [ "$current_timezone" != "$suggested_timezone" ]
+}
+
 get_latlon() {
     LATLON=`curl -s https://ipinfo.io/loc 2>> $LOG_FILE`
     LAT=$(echo $LATLON | cut -d ',' -f 1)
@@ -73,9 +79,13 @@ if [ "$STATUS" = "up" ]; then
     log_message ""
     log_message "Script update_timezone started at $(date)"
 
-    update_timezone
-    get_latlon
-    kill_xflux
-    restart_xflux
-    log_message "update_timezone finished at $(date)"
+    if check_timezone_change; then
+        update_timezone
+        get_latlon
+        kill_xflux
+        restart_xflux
+        log_message "update_timezone finished at $(date)"
+    else
+        log_message "No timezone change detected, skipping update."
+    fi
 fi
