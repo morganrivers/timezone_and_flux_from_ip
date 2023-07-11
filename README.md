@@ -1,119 +1,68 @@
 # Timezone and Flux from IP
 
-This repository contains a shell script that updates the system timezone and the color temperature of the display based on the geolocation of the current IP address. The script is designed to be used with NetworkManager's dispatcher to be executed whenever a network connection goes up.
+This Linux-based shell script automatically updates your system timezone and adjusts your display's color temperature based on your current IP geolocation. This script is designed to work with NetworkManager's dispatcher, and triggers whenever your network connection goes up.
 
-NOTE: ONLY WORKS ON LINUX MACHINES WITH NETWORKMANAGER INSTALLED
+## Prerequisites
 
-ALSO, YOU NEED TO BE USING X (PROBABLY X11)
+1. **Linux with NetworkManager**: To check if NetworkManager is installed, use the command `nmcli -v`. This will return the installed version, or an error if it's not installed.
 
-To see  if you have network manager, run the following script: 
+2. **X server (e.g. X11)**: To check if you are using X, run `ps -e | grep tty`. As long as "Xorg" appears in the process list, you're using X.
 
-```
-nmcli -v
-```
-If NetworkManager is installed, this command will return the version of NetworkManager that is currently installed on your system. If it is not installed, you will see an error message saying "command not found" or similar.
+## System Compatibility
 
-To test if you are using X (such as X11), run the following:
-```
-ps -e | grep tty
-```
-You're running X as long as you see "Xorg" as one of the processes.
+This script has been tested on:
 
-Systems tested that this works on so far:
+- `Linux 5.10.0-14-amd64 #1 SMP Debian 5.10.113-1 (2022-04-29) x86_64 GNU/Linux`
+- `Linux casta 5.10.133 #1 SMP PREEMPT Sat Nov 19 21:06:46 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux`
 
-```
-Linux 5.10.0-14-amd64 #1 SMP Debian 5.10.113-1 (2022-04-29) x86_64 GNU/Linux
-Linux casta 5.10.133 #1 SMP PREEMPT Sat Nov 19 21:06:46 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
-```
-You can check your system by running the command
+Check your system using `uname -a`.
 
-```
-uname -a
-```
+## Functionality
 
+The main script, located at `/etc/NetworkManager/dispatcher.d/update_timezone`, executes the following steps:
 
-
-## Script
-
-The main script is located at `/etc/NetworkManager/dispatcher.d/update_timezone`.
-The script performs the following actions:
-
-1. Logs the start of the script, the network interface, and its status.
-2. If the network interface status is "up", the script updates the system timezone using `tzupdate`.
-3. Retrieves the latitude and longitude of the current public IP using the ipinfo.io API.
-4. Saves the latitude and longitude to a file located at `$HOME/latlon.txt`. Feel free to alter the script to whatever location you need.
-5. Kills any running instances of `xflux`, a program that adjusts a display's color temperature according to location and time of day.
-6. Starts a new instance of `xflux` with the new latitude and longitude.
-7. Logs the end of the script execution.
+1. Logs the script start, network interface, and status.
+2. If the network interface status is "up":
+    - Updates the system timezone with `tzupdate`.
+    - Retrieves and saves current latitude and longitude using the ipinfo.io API.
+    - Kills any running `xflux` instances.
+    - Starts a new `xflux` instance with the new latitude and longitude.
+3. Logs the script execution end.
 
 ## Installation
 
-To install, clone this repository and copy the `update_timezone` script to `/etc/NetworkManager/dispatcher.d/`. Make sure to set the script as executable with `chmod +x`.
+1. Clone the repository and copy the script to `/etc/NetworkManager/dispatcher.d/`, ensuring it's executable:
 
-```
-git clone https://github.com/morganrivers/timezone_and_flux_from_ip.git
-sudo cp timezone_and_flux_from_ip/etc/NetworkManager/dispatcher.d/update_timezone /etc/NetworkManager/dispatcher.d/
-sudo chmod +x /etc/NetworkManager/dispatcher.d/update_timezone
-```
+   ```
+   git clone https://github.com/morganrivers/timezone_and_flux_from_ip.git
+   sudo cp timezone_and_flux_from_ip/etc/NetworkManager/dispatcher.d/update_timezone /etc/NetworkManager/dispatcher.d/
+   sudo chmod +x /etc/NetworkManager/dispatcher.d/update_timezone
+   ```
 
-You also need to install xflux and tzupdate.
+2. Install `tzupdate` and `xflux`:
 
-On systems with pip3, tzupdate installation would be:
+   - For `tzupdate`: `sudo pip install -U tzupdate`
+   - For `xflux`, download from [here](https://justgetflux.com/linux.html) and run:
 
-```
-sudo pip install -U tzupdate
-```
-
-As for xflux, you can download from here:
-
-https://justgetflux.com/linux.html
-
-Once you dowload, you can just run:
-
-```
- tar zxvf xflux64.tgz
-```
-check it works by running it
-
-```
-./xflux
-```
-
-You should get:
-```
---------
-Welcome to xflux (f.lux for X)
-This will only work if you're running X on console.
-
-Usage: ./xflux [-z zipcode | -l latitude] [-g longitude] [-k colortemp (default 3400)] [-r 1 (use randr)] [-nofork]
-protip: Say where you are (use -z or -l).
-```
-
-Now, if that worked add xflux to your discoverable executables:
-
-```
-sudo cp xflux /usr/local/bin/
-```
-
-(Sorry, xflux is apparently closed source. But also redshift is not working well for some people with debian/archlinux. You could modify the script to work with redshift reasonably easily as well. for example, replacing the line calling xflux with: `redshift -l $LAT:$LON`)
+     ```
+     tar zxvf xflux64.tgz
+     ./xflux
+     sudo cp xflux /usr/local/bin/
+     ```
 
 ## Usage
 
-Whenever you run `nmcli device wifi`, you see a list of wifi options.
+The script triggers automatically upon establishing a network connection using NetworkManager, updating the timezone and adjusting screen temperature only if the timezone changes.
 
-Then, the following (standard command line usage of networkmanager nmcli) will not only connect to wifi, it will also run the script automatically and set your timezone and system clock, and turn on your flux now for better sleep!
+Connect to a network, e.g., via Wi-Fi:
 
-<pre>
- nmcli device wifi connect <b>your_network</b> password <b>your_password</b>
-</pre>
+```
+nmcli device wifi connect <your_network> password <your_password>
+```
 
 ## Dependencies
 
-The script depends on the following tools:
-- `tzupdate`: for updating the system timezone.
-- `curl`: for making API calls.
-- `xflux`: for adjusting the display's color temperature.
-- `nmcli`: NetworkManager, needed to call script on network connection.
-
-
-Ensure these tools are installed on your system before running the script.
+- `tzupdate`: Updates the system timezone.
+- `curl`: Makes API calls.
+- `xflux`: Adjusts display's color temperature.
+- `nmcli`: NetworkManager command-line tool.
