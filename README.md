@@ -29,6 +29,8 @@ The main script, located at `/etc/NetworkManager/dispatcher.d/update_timezone`, 
     - Starts a new `xflux` instance with the new latitude and longitude.
 3. Logs the script execution end.
 
+If you're interested in Redshift: Although xflux is closed source, redshift is not working well for some people with debian/ubuntu/archlinux. You could modify the script to work with redshift reasonably easily as well. for example, replacing the line calling xflux with: `redshift -l $LAT:$LON`.
+
 ## Installation
 
 1. Clone the repository and copy the script to `/etc/NetworkManager/dispatcher.d/`, ensuring it's executable:
