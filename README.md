@@ -60,7 +60,7 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
 
     ```
     sudo mkdir -p /etc/X11/xinit/xinit.d/
-    sudo cp xflux_on_startup /etc/X11/xinit/xinit.d/
+    sudo cp etc/X11/xinit/xinit.d/xflux_on_startup /etc/X11/xinit/xinit.d/
     sudo chmod +x /etc/X11/xinit/xinit.d/xflux_on_startup
     ```
 
