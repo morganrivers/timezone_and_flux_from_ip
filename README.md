@@ -8,6 +8,8 @@ This Linux-based shell script automatically updates your system timezone and adj
 
 2. **X server (e.g. X11)**: To check if you are using X, run `ps -e | grep tty`. As long as "Xorg" appears in the process list, you're using X.
 
+3. **curl** To check for curl, run `curl --version`. If it doesn't show a version, run `sudo apt install curl` to install curl.
+
 ## System Compatibility
 
 This script has been tested on:
@@ -19,7 +21,7 @@ Check your system using `uname -a`.
 
 ## Functionality
 
-The main script, located at `/etc/NetworkManager/dispatcher.d/update_timezone`, executes the following steps:
+The update_timezone script, located at `/etc/NetworkManager/dispatcher.d/update_timezone`, executes the following steps:
 
 1. Logs the script start, network interface, and status.
 2. If the network interface status is "up":
@@ -30,6 +32,8 @@ The main script, located at `/etc/NetworkManager/dispatcher.d/update_timezone`, 
 3. Logs the script execution end.
 
 If you're interested in Redshift: Although xflux is closed source, redshift is not working well for some people with debian/ubuntu/archlinux. You could modify the script to work with redshift reasonably easily as well. for example, replacing the line calling xflux with: `redshift -l $LAT:$LON`.
+
+
 
 ## Installation
 
@@ -51,6 +55,16 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
      ./xflux
      sudo cp xflux /usr/local/bin/
      ```
+     
+3.  If you'd also like to have xflux on startup, you can place the `xflux_on_startup` script in `/etc/X11/xinit/xinitrc.d`.
+
+    ```
+    sudo mkdir -p /etc/X11/xinit/xinit.d/
+    sudo cp xflux_on_startup /etc/X11/xinit/xinit.d/
+    sudo chmod +x /etc/X11/xinit/xinit.d/xflux_on_startup
+    ```
+
+
 
 ## Usage
 
@@ -61,6 +75,17 @@ Connect to a network, e.g., via Wi-Fi:
 ```
 nmcli device wifi connect <your_network> password <your_password>
 ```
+
+The startup script will automatically kill any  xflux and start on boot as well. This will only work if you've connected to the internet, as xflux needs latitude and longitude information to set the correct color temperature.
+
+You'd need to use a text editor to edit `/etc/X11/xinit/xinit.d/xflux_on_startup` and `/etc/NetworkManager/dispatcher.d/update_timezone`.
+
+To change the redness, you would edit the line in both files:
+```
+xflux -l $LAT -g $LON -k 2000
+```
+You can change the 2000 after the "-k" to be some other temperature. 2000 is the lowest xflux allows, and a little less red and more blue is 2500, 3000 or 4000.
+
 
 ## Dependencies
 
