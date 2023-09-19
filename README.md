@@ -8,7 +8,7 @@ This Linux-based shell script automatically updates your system timezone and adj
 
 2. **X server (e.g. X11)**: To check if you are using X, run `ps -e | grep tty`. As long as "Xorg" appears in the process list, you're using X.
 
-3. **curl** To check for curl, run `curl --version`. If it doesn't show a version, run `sudo apt install curl` to install curl.
+3. **curl**: To check for curl, run `curl --version`. If it doesn't show a version, run `sudo apt install curl` to install curl.
 
 ## System Compatibility
 
