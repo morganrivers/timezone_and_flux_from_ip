@@ -14,7 +14,7 @@ if [ -f "$OUTPUT_FILE" ]; then
     export DISPLAY=:0
 
     kill_xflux() {
-   	killall xflux
+   	killall -q xflux
 	while true;
         	do allxflux=$(pidof xflux);
         	wtsp=" ";
@@ -22,11 +22,11 @@ if [ -f "$OUTPUT_FILE" ]; then
         	allxflux=${allxflux#*"$wtsp"};
         	case "$allxflux" in
                 	*" "*)
-                        	kill -9 "$tmpxflux";
+                        	kill -9 "$tmpxflux"  > /dev/null 2>&1;
                         	continue;
                 	;;
                 	*)
-                        	kill -9 "$tmpxflux";
+                        	kill -9 "$tmpxflux"  > /dev/null 2>&1;
                         	break;
                 	;;
         	esac;
