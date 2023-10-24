@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script updates the system timezone and flux parameters based on the current IP geolocation
 # The script gets triggered whenever the network interface status changes to 'up'
@@ -9,7 +9,7 @@ STATUS=$2
 
 username=$(who | awk '{print $1; exit}')
 
-LOG_FILE="/home/$username/dispatcher.log"
+LOG_FILE="/home/$username/xflux_log.log"
 OUTPUT_FILE="/home/$username/latlon.txt"
 
 # display=$(who | grep -P '\(:[0-9](\.[0-9])?\)' | awk '{print $5}' | tr -d '()')
@@ -20,7 +20,7 @@ log_message() {
 }
 
 update_timezone() { 
-    echo "tzupdate things" >> $LOG_FILE
+    log_message "tzupdate things"
     sudo tzupdate >> $LOG_FILE
     log_message "tzupdate command executed"
 }
@@ -31,61 +31,103 @@ check_timezone_change() {
     [ "$current_timezone" != "$suggested_timezone" ]
 }
 
+check_lat_and_lon_are_valid() {
+    local LAT=$1
+    local LON=$2
+    # Check if LAT or LON is not a valid number
+    if [[ ! $LAT =~ ^-?[0-9]+([.][0-9]+)?$ ]] || [[ ! $LON =~ ^-?[0-9]+([.][0-9]+)?$ ]]; then
+        return 1
+    fi
+    return 0
+}
+
+# Check the values in OUTPUT_FILE for validity
+check_output_file_values() {
+    if [ ! -f "$OUTPUT_FILE" ]; then
+        return 1
+    fi
+    
+    LAT=$(cat $OUTPUT_FILE | cut -d ',' -f 1)
+    LON=$(cat $OUTPUT_FILE | cut -d ',' -f 2)
+    
+    check_lat_and_lon_are_valid $LAT $LON
+    return $?
+}
+
 get_latlon() {
     LATLON=`curl -s https://ipinfo.io/loc 2>> $LOG_FILE`
     LAT=$(echo $LATLON | cut -d ',' -f 1)
     LON=$(echo $LATLON | cut -d ',' -f 2)
+
+    check_lat_and_lon_are_valid $LAT $LON
+
+    if [ $? -eq 1 ]; then
+        log_message "The lat and lon read from the ipinfo.io were invalid."
+        return
+    fi
+    
     echo "$LAT,$LON" > $OUTPUT_FILE
+
     log_message "Latitude: $LAT, Longitude: $LON"
 }
 
 kill_xflux() {
-   	killall -q xflux
-	while true;
-        	do allxflux=$(pidof xflux);
-        	wtsp=" ";
-        	tmpxflux=${allxflux%%"$wtsp"*};
-        	allxflux=${allxflux#*"$wtsp"};
-        	case "$allxflux" in
-                	*" "*)
-                        	kill -9 "$tmpxflux"  > /dev/null 2>&1;
-                        	continue;
-                	;;
-                	*)
-                        	kill -9 "$tmpxflux"  > /dev/null 2>&1;
-                        	break;
-                	;;
-        	esac;
-	done;
-   	log_message "xflux killed"
+    killall -q xflux
+    while true;
+            do allxflux=$(pidof xflux);
+            wtsp=" ";
+            tmpxflux=${allxflux%%"$wtsp"*};
+            allxflux=${allxflux#*"$wtsp"};
+            case "$allxflux" in
+                    *" "*)
+                            kill -9 "$tmpxflux"  > /dev/null 2>&1;
+                            continue;
+                    ;;
+                    *)
+                            kill -9 "$tmpxflux"  > /dev/null 2>&1;
+                            break;
+                    ;;
+            esac;
+    done;
+    log_message "xflux killed"
 }
 
-restart_xflux() {
+start_xflux() {
     LAT=$(cat $OUTPUT_FILE | cut -d ',' -f 1)
     LON=$(cat $OUTPUT_FILE | cut -d ',' -f 2)
 
-    w >> $LOG_FILE
-    export XAUTHORITY=/home/$username/.Xauthority
-    xflux -l $LAT -g $LON -k 2000 >> $LOG_FILE 2>&1 &
-    log_message "New xflux started"
+    check_lat_and_lon_are_valid $LAT $LON
+
+    if [ $? -eq 1 ]; then
+        log_message "WARNING: The lat and lon read from the log file were invalid. Did not start xflux."
+    else
+        export XAUTHORITY=/home/$username/.Xauthority
+        xflux -l $LAT -g $LON -k 2000 >> $LOG_FILE 2>&1 &
+        log_message "New xflux started at latitude=$LAT, longitude=$LON"
+    fi
 }
 
 if [ "$STATUS" = "up" ]; then
-    
-    # Create files if not already created.
-    touch $LOG_FILE
-    touch $OUTPUT_FILE
 
-    log_message ""
+    # Create LOG_FILE if it doesn't exist
+    [ ! -f "$LOG_FILE" ] && touch "$LOG_FILE"
+    
+    log_message " "
+    log_message "---------------------------------------------------"
     log_message "Script update_timezone started at $(date)"
 
-    if check_timezone_change; then
+    # If either the OUTPUT_FILE doesn't exist/contains invalid values or there's a timezone change:
+    # update the timezone, fetch new lat/lon, kill existing xflux and start a new one
+    if ! check_output_file_values || check_timezone_change; then
         update_timezone
         get_latlon
         kill_xflux
-        restart_xflux
+        start_xflux
         log_message "update_timezone finished at $(date)"
     else
-        log_message "No timezone change detected, skipping update."
+        log_message "No timezone change detected and OUTPUT_FILE was set properly, skipping update."
     fi
+    log_message "---------------------------------------------------"
+    log_message " "
+
 fi
