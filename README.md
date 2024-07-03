@@ -56,12 +56,12 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
      sudo cp xflux /usr/local/bin/
      ```
      
-3.  If you'd also like to have xflux on startup, you can place the `xflux_on_startup` script in `/etc/X11/xinit/xinitrc.d`.
+3.  If you'd also like to have xflux on startup, you can place the `xflux_on_startup.sh` script in `/etc/X11/xinit/xinitrc.d`.
 
     ```
-    sudo mkdir -p /etc/X11/xinit/xinit.d/
-    sudo cp etc/X11/xinit/xinit.d/xflux_on_startup /etc/X11/xinit/xinit.d/
-    sudo chmod +x /etc/X11/xinit/xinit.d/xflux_on_startup
+    sudo mkdir -p /etc/X11/xinit/xinitrc.d/
+    sudo cp etc/X11/xinit/xinitrc.d/xflux_on_startup.sh /etc/X11/xinit/xinitrc.d/
+    sudo chmod +x /etc/X11/xinit/xinitrc.d/xflux_on_startup.sh
     ```
 
     You will also need to modify your .xinitrc if it doesn't already have the following lines. Add these lines at the bottom if they're not already in the `~/.xinitrc` script. Watch out not to put it after an exec command, such as `exec i3` or similiar!
@@ -91,7 +91,7 @@ nmcli device wifi connect <your_network> password <your_password>
 
 The startup script will automatically kill any  xflux and start on boot as well. This will only work if you've connected to the internet, as xflux needs latitude and longitude information to set the correct color temperature.
 
-You'd need to use a text editor to edit `/etc/X11/xinit/xinit.d/xflux_on_startup` and `/etc/NetworkManager/dispatcher.d/update_timezone`.
+You'd need to use a text editor to edit `/etc/X11/xinit/xinitrc.d/xflux_on_startup.sh` and `/etc/NetworkManager/dispatcher.d/update_timezone`.
 
 To change the redness, you would edit the line in both files:
 ```

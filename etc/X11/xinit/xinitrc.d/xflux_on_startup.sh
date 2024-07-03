@@ -52,6 +52,13 @@ log_message " "
 log_message "---------------------------------------------------"
 log_message "Startup Script run on: $(date +'%Y-%m-%d %H:%M:%S')"
 
+# Check if i3 is running
+if pgrep i3 >/dev/null 2>&1; then
+   log_message "i3 is running." 
+else
+   log_message "i3 is not running." 
+fi
+
 # Test if output file exists
 if [ -f "$OUTPUT_FILE" ]; then
     LAT=$(cut -d ',' -f 1 "$OUTPUT_FILE")
@@ -77,4 +84,4 @@ else
 fi
 
 echo "---------------------------------------------------" >> "$LOG_FILE"
-my echo " " >> "$LOG_FILE"
+echo " " >> "$LOG_FILE"

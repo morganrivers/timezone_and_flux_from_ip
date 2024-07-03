@@ -54,10 +54,11 @@ check_output_file_values() {
     return $?
 }
 
-get_latlon() {
+get_and_update_latlon() {
     LATLON=`curl -s https://ipinfo.io/loc 2>> $LOG_FILE`
     LAT=$(echo $LATLON | cut -d ',' -f 1)
     LON=$(echo $LATLON | cut -d ',' -f 2)
+    current_timezone=$(tzupdate --print-system-timezone)
 
     check_lat_and_lon_are_valid $LAT $LON
 
@@ -66,9 +67,24 @@ get_latlon() {
         return
     fi
     
-    echo "$LAT,$LON" > $OUTPUT_FILE
+    echo "$LAT,$LON,$current_timezone" > $OUTPUT_FILE
 
-    log_message "Latitude: $LAT, Longitude: $LON"
+    log_message "Latitude: $LAT, Longitude: $LON, Current timezone:$current_timezone"
+}
+
+
+get_current_location_info() {
+    LATLON=$(curl -s https://ipinfo.io/loc 2>> $LOG_FILE)
+    LAT=$(echo $LATLON | cut -d ',' -f 1)
+    LON=$(echo $LATLON | cut -d ',' -f 2)
+    check_lat_and_lon_are_valid $LAT $LON
+    if [ $? -eq 1 ]; then
+        log_message "The lat and lon read from the ipinfo.io were invalid."
+        return 1
+    fi
+    CURRENT_TZ=$(curl -s https://ipinfo.io/timezone 2>> $LOG_FILE)
+    log_message "Current location info: LAT=$LAT, LON=$LON, TZ=$CURRENT_TZ"
+    return 0
 }
 
 kill_xflux() {
@@ -107,6 +123,28 @@ start_xflux() {
     fi
 }
 
+location_exists_but_doesnt_match_timezone() {
+    # Only when the timezone in latlon.txt OUTPUT_FILE differs from the current timezone,
+    # that indicates the lat/lon are inappropriate, and xflux needs to be updated with new lat/lon.
+    get_current_location_info
+    if [ $? -ne 0 ]; then
+        log_message "location_exists_but_doesnt_match_timezone: location info is not available"
+        return 1  # False, since location info is not available
+    fi
+
+    XFLUX_TIMEZONE=$(cat $OUTPUT_FILE | cut -d ',' -f 3)
+    CURRENT_TZ=$(tzupdate --print-system-timezone)
+    log_message "XFLUX_TIMEZONE: ${XFLUX_TIMEZONE}, CURRENT_TZ: ${CURRENT_TZ}"
+
+    if [ "$XFLUX_TIMEZONE" != "$CURRENT_TZ" ]; then
+        log_message "location_exists_but_doesnt_match_timezone: mismatch in timezones!"
+        return 0  # True, there is a mismatch
+    else
+        log_message "location_exists_but_doesnt_match_timezone: no mismatch in timezones"
+        return 1  # False, no mismatch
+    fi
+}
+
 if [ "$STATUS" = "up" ]; then
 
     # Create LOG_FILE if it doesn't exist
@@ -115,12 +153,32 @@ if [ "$STATUS" = "up" ]; then
     log_message " "
     log_message "---------------------------------------------------"
     log_message "Script update_timezone started at $(date)"
+    log_message "Arguments passed to script: $0 $IF $STATUS"
+    
+    # we always try to update the timezone when networkmanager starts.
+    update_timezone
 
     # If either the OUTPUT_FILE doesn't exist/contains invalid values or there's a timezone change:
     # update the timezone, fetch new lat/lon, kill existing xflux and start a new one
-    if ! check_output_file_values || check_timezone_change; then
-        update_timezone
-        get_latlon
+    if check_output_file_values; then
+        log_message "check_output_file_values: true"
+    else
+        log_message "check_output_file_values: false"
+    fi
+
+    if check_timezone_change; then
+        log_message "check_timezone_change: true"
+    else
+        log_message "check_timezone_change: false"
+    fi
+    if location_exists_but_doesnt_match_timezone; then
+        log_message "Location exists but doesn't match timezone: true"
+    else
+        log_message "Location exists but doesn't match timezone: false"
+    fi
+
+    if ! check_output_file_values || check_timezone_change || location_exists_but_doesnt_match_timezone; then
+        get_and_update_latlon
         kill_xflux
         start_xflux
         log_message "update_timezone finished at $(date)"
