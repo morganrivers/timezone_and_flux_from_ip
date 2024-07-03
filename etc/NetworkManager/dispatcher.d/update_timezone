@@ -7,7 +7,9 @@
 IF=$1
 STATUS=$2
 
-username=$(who | awk '{print $1; exit}')
+# Fetch the username of the user with an active graphical session
+username=$(loginctl list-users | grep 1000 | awk '{print $2}')
+
 
 LOG_FILE="/home/$username/xflux_log.log"
 OUTPUT_FILE="/home/$username/latlon.txt"
@@ -15,9 +17,14 @@ OUTPUT_FILE="/home/$username/latlon.txt"
 # display=$(who | grep -P '\(:[0-9](\.[0-9])?\)' | awk '{print $5}' | tr -d '()')
 export DISPLAY=:0
 
+
 log_message() {
     echo "$1" >> $LOG_FILE
 }
+log_message "$(date) update_timezone was at least run,"
+log_message "with status: $STATUS"
+
+
 
 update_timezone() { 
     log_message "tzupdate things"
@@ -144,6 +151,7 @@ location_exists_but_doesnt_match_timezone() {
         return 1  # False, no mismatch
     fi
 }
+
 
 if [ "$STATUS" = "up" ]; then
 
