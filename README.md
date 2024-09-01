@@ -10,6 +10,8 @@ This Linux-based shell script automatically updates your system timezone and adj
 
 3. **curl**: To check for curl, run `curl --version`. If it doesn't show a version, run `sudo apt install curl` to install curl.
 
+4. **pip**: Install with `sudo apt-get install pip`
+
 ## System Compatibility
 
 This script has been tested on:
@@ -107,3 +109,4 @@ You can change the 2000 after the "-k" to be some other temperature. 2000 is the
 - `curl`: Makes API calls.
 - `xflux`: Adjusts display's color temperature.
 - `nmcli`: NetworkManager command-line tool.
+- `pip`: Python package manager.
