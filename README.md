@@ -37,11 +37,12 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
 
 ## Installation
 
-1. Clone the repository and copy the script to `/etc/NetworkManager/dispatcher.d/`, ensuring it's executable:
+1. Clone the repository and enter it (`cd timezone_and_flux_from_ip`) and copy the script to `/etc/NetworkManager/dispatcher.d/`, ensuring it's executable:
 
    ```
    git clone https://github.com/morganrivers/timezone_and_flux_from_ip.git
-   sudo cp timezone_and_flux_from_ip/etc/NetworkManager/dispatcher.d/update_timezone /etc/NetworkManager/dispatcher.d/
+   cd timezone_and_flux_from_ip
+   sudo cp etc/NetworkManager/dispatcher.d/update_timezone /etc/NetworkManager/dispatcher.d/
    sudo chmod +x /etc/NetworkManager/dispatcher.d/update_timezone
    ```
 
