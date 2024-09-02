@@ -78,7 +78,20 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
 
      ```
      tar zxvf xflux64.tgz
-     ./xflux
+     ```
+
+     Now if you run `./xflux` You should see:
+     ```
+     --------
+     Welcome to xflux (f.lux for X)
+     This will only work if you're running X on console.
+    
+     Usage: ./xflux [-z zipcode | -l latitude] [-g longitude] [-k colortemp (default 3400)] [-r 1 (use randr)] [-nofork]
+     protip: Say where you are (use -z or -l).
+     ```
+
+     Finally to install xflux, run the command:     
+     ```
      sudo cp xflux /usr/local/bin/
      ```
      
