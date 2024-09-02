@@ -147,8 +147,38 @@ Your xflux log is located at `~/xflux_log.log` and has sudo permissions for read
 
 To check if the script is working, you can run `sudo cat ~/xflux_log.log`. You should see something like the following:
 
-[TODO]
+```
 
+---------------------------------------------------
+Script update_timezone started at Mon Sep  2 13:06:32 CEST 2024
+Arguments passed to script: /etc/NetworkManager/dispatcher.d/update_timezone wlp0s20f3 up
+tzupdate things
+Set system timezone to Europe/Berlin.
+tzupdate command executed
+check_output_file_values: false
+check_timezone_change: false
+Current location info: LAT=52.6763, LON=13.2777, TZ=Europe/Berlin
+cat: /home/dmrivers/latlon.txt: No such file or directory
+XFLUX_TIMEZONE: , CURRENT_TZ: Europe/Berlin
+location_exists_but_doesnt_match_timezone: mismatch in timezones!
+Location exists but doesn't match timezone: true
+Latitude: 52.6763, Longitude: 13.2777, Current timezone:Europe/Berlin
+xflux killed
+New xflux started at latitude=52.6763, longitude=13.2777
+update_timezone finished at Mon Sep  2 13:06:34 CEST 2024
+---------------------------------------------------
+
+^[[2J^[[0;0f
+--------
+Welcome to xflux (f.lux for X)
+This will only work if you're running X on console.
+
+Found 1 screen.
+Your location (lat, long) is 52.7, 13.3
+
+Your night-time color temperature is 2000
+Going to background: 'kill 11725' to turn off.
+```
 ## Dependencies
 
 - `tzupdate`: Updates the system timezone.
