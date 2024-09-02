@@ -145,7 +145,7 @@ You can change the 2000 after the "-k" to be some other temperature. 2000 is the
 ## Checking if it worked
 Your xflux log is located at `~/xflux_log.log` and has sudo permissions for read/write. Your location file stores your location determined by `tzupdate` at `~/latlon.txt`. You can change these locations in the `update_timezone` and `xflux_on_startup.sh` scripts. This stores both error logs and normal operations, including the history of lat/lon locations.
 
-To check if the script is working, you can run `sudo cat ~/xflux_log.log`. You should see something like the following:
+To check if the script is working, you can run `sudo cat ~/xflux_log.log`. You should see something like the following once you have connected to `NetworkManager` using `nmcli` command or similar:
 
 ```
 
