@@ -39,18 +39,41 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
 
 ## Installation
 
-1. Clone the repository and enter it (`cd timezone_and_flux_from_ip`) and copy the script to `/etc/NetworkManager/dispatcher.d/`, ensuring it's executable:
+1. Clone the repository and enter it (`cd timezone_and_flux_from_ip`):
 
    ```
    git clone https://github.com/morganrivers/timezone_and_flux_from_ip.git
    cd timezone_and_flux_from_ip
-   sudo cp etc/NetworkManager/dispatcher.d/update_timezone /etc/NetworkManager/dispatcher.d/
-   sudo chmod +x /etc/NetworkManager/dispatcher.d/update_timezone
    ```
 
 2. Install `tzupdate` and `xflux`:
 
-   - For `tzupdate`: `sudo pip install -U tzupdate`
+   - For `tzupdate`, try installing like this:
+     ```
+     sudo pip install -U tzupdate`
+     ```
+     Ensure this worked by running `sudo tzupdate`. You should get a response like: `Set system timezone to [your continent]/[your city].`
+
+     On Ubuntu, sometimes `sudo tzupdate` command doesn't work, but `sudo ~/.local/bin/tzupdate` does. In this case it is necessary to edit the `etc/NetworkManager/dispatcher.d/update_timezone` file and replace the update_timezone() command:
+
+     From this:
+     ```
+     update_timezone() { 
+         log_message "tzupdate things"
+         sudo tzupdate >> $LOG_FILE
+         log_message "tzupdate command executed"
+     }
+     ```
+
+     To this:
+     ```
+     update_timezone() { 
+         log_message "tzupdate things"
+         sudo /home/$username/.local/bin/tzupdate >> $LOG_FILE
+         log_message "tzupdate command executed"
+     }
+     ```
+     
    - For `xflux`, download from [here](https://justgetflux.com/linux.html) and run:
 
      ```
@@ -59,7 +82,12 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
      sudo cp xflux /usr/local/bin/
      ```
      
-3.  If you'd also like to have xflux on startup, you can place the `xflux_on_startup.sh` script in `/etc/X11/xinit/xinitrc.d`.
+3. If the steps above worked, copy the script to `/etc/NetworkManager/dispatcher.d/`, ensuring it's executable.
+   ```
+   sudo cp etc/NetworkManager/dispatcher.d/update_timezone /etc/NetworkManager/dispatcher.d/
+   sudo chmod +x /etc/NetworkManager/dispatcher.d/update_timezone
+   ```    
+5.  If you'd also like to have xflux on startup, you can place the `xflux_on_startup.sh` script in `/etc/X11/xinit/xinitrc.d`.
 
     ```
     sudo mkdir -p /etc/X11/xinit/xinitrc.d/
@@ -79,7 +107,6 @@ If you're interested in Redshift: Although xflux is closed source, redshift is n
     fi
     ```
 
-    
 
 
 ## Usage
